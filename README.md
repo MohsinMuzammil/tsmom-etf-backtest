@@ -6,7 +6,7 @@ of each asset's own past returns. The strategy implements the time-series
 momentum framework of Moskowitz, Ooi, and Pedersen (2012) with volatility
 targeting, monthly rebalancing, and transaction cost accounting.
 
-**[Read the full analysis notebook](tsm_exploration.ipynb)** — 35 cells
+**[Read the full analysis notebook](tsmom_exploration.ipynb)** — 36 cells
 covering methodology, headline results, statistical tests, robustness checks,
 and limitations.
 
@@ -24,9 +24,11 @@ Over 2007–2025, on eight ETFs:
 | Alpha (annualised) | 5.58% (t = 2.58) | — |
 
 The strategy does not beat SPY in absolute return. Its value is as a
-diversifier: a near-zero-beta return stream with roughly one-third the
-drawdown. Adding a 20% allocation to a SPY portfolio raises the combined
-Sharpe from 0.62 to 0.68 while cutting the max drawdown from -55% to -43%.
+diversifier: a return stream with near-zero average beta (the rolling correlation
+to SPY ranges from about -0.9 to +0.8, so it is not uncorrelated at every point
+in time) and roughly one-third the drawdown. Adding a 20% allocation to a SPY
+portfolio raises the combined Sharpe from 0.62 to 0.68 while cutting the max
+drawdown from -55% to -43%. The 95% bootstrap CI on the Sharpe is [0.18, 1.00].
 
 ## Figures
 
@@ -57,7 +59,7 @@ Sharpe from 0.62 to 0.68 while cutting the max drawdown from -55% to -43%.
 ├── requirements.txt
 ├── tsmom_monthly.py        # strategy: data loading, backtest, perf stats
 ├── stats.py                # analysis: bootstrap, regression, plots
-├── tsm_exploration.ipynb   # narrative notebook with figures and interpretation
+├── tsmom_exploration.ipynb  # narrative notebook with figures and interpretation
 ├── data/
 │   └── prices.csv          # cached adjusted closes (gitignored, regenerated on first run)
 └── figures/
@@ -77,13 +79,14 @@ pip install -r requirements.txt
 python tsmom_monthly.py
 ```
 
-Prints headline performance, per-asset contribution, and comparison against
-SPY. Figures are saved to `figures/`.
+Prints a performance table (vol-targeted and equal-weight versions), SPY
+buy-and-hold over the same period, and the strategy's beta to SPY, and shows a
+cumulative-return plot. The notebook generates the figures saved in `figures/`.
 
 To reproduce the full analysis, open the notebook:
 
 ```bash
-jupyter notebook tsm_exploration.ipynb
+jupyter notebook tsmom_exploration.ipynb
 ```
 
 ## Data
@@ -102,7 +105,7 @@ fetch.
 
 - No financing cost on leverage above 1× capital (average gross exposure is
   1.05×, so the effect is small).
-- No borrow cost on short positions (would reduce Sharpe by roughly 0.02 at
+- No borrow cost on short positions (would reduce Sharpe by roughly 0.02–0.03 at
   50 bps annualised).
 - ETF basket selected with hindsight.
 - Sharpe is arithmetic, mean/std × √252, on raw returns without subtracting
